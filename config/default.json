@@ -4,5 +4,33 @@
     "consumer_secret": "",
     "access_token": "",
     "access_token_secret": ""
+  },
+  "twoet": {
+    "faux_detournement": {
+      "enabled": true,
+      "sample_size": 1000
+    },
+    "detournement_context": {
+      "language": "es",
+      "size": 10
+    },
+    "poem_rules": {
+      "verse_count": 4
+    },
+    "rhyming_plugins": {
+      "es": {
+        "package": "rimador",
+        "requires_new": false,
+        "post_install": "",
+        "input": "analyze",
+        "output": {
+          "type": "object",
+          "mapping": {
+            "rhyme": "rhyme",
+            "asonance": "asonance"
+          }
+        }
+      }
+    }
   }
 }

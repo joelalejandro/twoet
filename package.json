@@ -46,6 +46,7 @@
     "eslint-plugin-react": "^5.0.1",
     "istanbul": "^1.0.0-alpha.2",
     "mocha": "^2.4.5",
+    "pace": "0.0.4",
     "rollup": "^0.26.2",
     "rollup-plugin-babel": "^2.4.0",
     "sinon": "^2.0.0-pre"
@@ -55,6 +56,8 @@
     "test": "mocha --compilers js:babel-register",
     "test:watch": "mocha --compilers js:babel-register --reporter min --watch",
     "test:cover": "babel-node ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
+    "build:detournement": "babel-node tools/generate-detournement",
+    "build:language": "babel-node tools/install-language",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "build": "node tools/build",
     "prepublish": "npm run build",
