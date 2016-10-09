@@ -22,7 +22,6 @@ import Twit from 'twit';
 import Config from 'config';
 import EventEmitter from 'events';
 import fs from 'fs';
-import Twoem from './Twoem';
 
 const T = new Twit(Config.get('twitter'));
 
@@ -58,18 +57,6 @@ class Twoet extends EventEmitter {
       }
     });
   }
-
-  /*beginComposing(tweets = this.tweets, verses = this.settings.poem_rules.verse_count) {
-    return new Promise((resolve, reject) => {
-      try {
-        this.twoem = new Twoem();
-        this.twoem.push(tweets);
-        resolve(this.twoem);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }*/
 
   sanitize(tweet) {
     let text = tweet.text.replace(/\n/g, '').replace(/RT /g, '');
