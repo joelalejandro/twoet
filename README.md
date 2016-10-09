@@ -33,7 +33,9 @@ In order to set-up the environment, you must:
 - Run `npm run build:detournement` to get a sample of tweets.
 - Run `npm run test` to see how poems are generated through the `compose()` method.
 
-### A sample Poem object
+### A sample Twoem
+
+> `Twoem`: a Tweet-derived poem.
 
 ```javascript
 { title: 'Twoem 5681 0869 7920 4896',
