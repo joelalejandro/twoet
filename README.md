@@ -1,11 +1,5 @@
 # [twoet](https://github.com/joelalejandro/twoet)
 
-[![NPM version](http://img.shields.io/npm/v/twoet.svg?style=flat-square)](https://www.npmjs.com/package/twoet)
-[![NPM downloads](http://img.shields.io/npm/dm/twoet.svg?style=flat-square)](https://www.npmjs.com/package/twoet)
-[![Build Status](http://img.shields.io/travis/joelalejandro/twoet/master.svg?style=flat-square)](https://travis-ci.org/joelalejandro/twoet)
-[![Coverage Status](https://img.shields.io/coveralls/joelalejandro/twoet.svg?style=flat-square)](https://coveralls.io/joelalejandro/twoet)
-[![Dependency Status](http://img.shields.io/david/joelalejandro/twoet.svg?style=flat-square)](https://david-dm.org/joelalejandro/twoet)
-
 > A tweet-fed poem generator.
 
 ### About this project
@@ -19,7 +13,9 @@ and then matching tweets in pairs with an `ABAB` rhyming scheme through [`rimado
 ### How to install
 
 ```sh
-$ npm install twoet
+$ git clone https://github.com/joelalejandro/twoet
+$ cd twoet
+$ npm install
 ```
 
 ### Using `twoet`
