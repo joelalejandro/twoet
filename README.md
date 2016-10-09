@@ -33,6 +33,19 @@ In order to set-up the environment, you must:
 - Run `npm run build:detournement` to get a sample of tweets.
 - Run `npm run test` to see how poems are generated through the `compose()` method.
 
+### A sample Poem object
+
+```javascript
+{ title: 'Twoem 5681 0869 7920 4896',
+  authors: 
+   [ /* ... */ ],
+  verses: 
+   [ 'Mi vieja dijo "doy gracias a dios que ninguno de mis hijos fuma marihuana".',
+     'y ninguno conmigo pedazo de gato',
+     'Sonríe Hoy, Por que Quizás no Haya Un Mañana.',
+     'Alguien que me desaburra un rato?' ] }
+```
+
 ### License
 
 MIT © 2016 Joel A. Villarreal Bertoldi
