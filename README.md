@@ -44,6 +44,10 @@ In order to set-up the environment, you must:
      'Alguien que me desaburra un rato?' ] }
 ```
 
+### Sample output from Twoem server
+
+http://imgur.com/b8P94di
+
 ### License
 
 MIT © 2016 Joel A. Villarreal Bertoldi
