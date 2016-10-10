@@ -4,6 +4,7 @@ import express from 'express';
 import minimist from 'minimist';
 import exec from 'promised-exec';
 import jsonMarkup from 'json-markup';
+import Config from 'config';
 
 const app = express();
 const args = minimist(process.argv.slice(2));
@@ -18,7 +19,24 @@ const readTwoem = (poem, res) => {
     return `<a href="https://twitter.com/${author.id}">@${author.alias}</a>`;
   }).join(', ') + '</p>');
   res.write('<p>compartir: <input size="40" type="text" value="http://twoemme.com/' + poem.id + '"></p>')
-  res.send();
+};
+
+const sendAnalytics = (res) => {
+  try {
+    const analytics = Config.get('analytics');
+    res.write(`<script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', '${analytics.tracking_id}', 'auto');
+      ga('send', 'pageview');
+
+    </script>`);
+  } catch (e) {
+
+  }
 };
 
 app.get('/', function (req, res) {
@@ -27,6 +45,8 @@ app.get('/', function (req, res) {
     const poem = tw.compose();
     fs.writeFileSync(`server/generated/${poem.id}.twoem`, JSON.stringify(poem));
     readTwoem(poem, res);
+    sendAnalytics(res);
+    res.send();
   });
 });
 
@@ -34,6 +54,8 @@ app.get('/:id', function (req, res) {
   try {
     const poem = JSON.parse(fs.readFileSync(`server/generated/${req.params.id}.twoem`));
     readTwoem(poem, res);
+    sendAnalytics(res);
+    res.send();
   } catch (e) {
 
   }
