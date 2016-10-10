@@ -142,8 +142,8 @@ class Twoet extends EventEmitter {
         let tweetB = rhyme.shuffle()[Math.floor(Math.random() * rhyme.length)];
         blockB.push(this.sanitize(tweetB));
 
-        authors.push({ name: tweet.user.name, alias: tweet.user.screen_name });
-        authors.push({ name: tweetB.user.name, alias: tweetB.user.screen_name });
+        authors.push({ name: tweet.user.name, alias: tweet.user.screen_name, id: tweet.user.screen_name + '/status/' + tweet.id_str});
+        authors.push({ name: tweetB.user.name, alias: tweetB.user.screen_name, id: tweetB.user.screen_name + '/status/' + tweetB.id_str });
 
         titleBlocks.push(tweet.id_str.substr(-4));
         titleBlocks.push(tweetB.id_str.substr(-4));

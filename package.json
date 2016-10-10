@@ -44,9 +44,13 @@
     "eslint-plugin-import": "^1.6.1",
     "eslint-plugin-jsx-a11y": "^1.0.4",
     "eslint-plugin-react": "^5.0.1",
+    "express": "^4.14.0",
     "istanbul": "^1.0.0-alpha.2",
+    "json-markup": "^1.0.0",
+    "minimist": "^1.2.0",
     "mocha": "^2.4.5",
     "pace": "0.0.4",
+    "promised-exec": "^1.0.1",
     "rollup": "^0.26.2",
     "rollup-plugin-babel": "^2.4.0",
     "sinon": "^2.0.0-pre"
@@ -59,9 +63,9 @@
     "build:detournement": "babel-node tools/generate-detournement",
     "build:language": "babel-node tools/install-language",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
-    "build": "node tools/build",
+    "build": "node tools/build && npm run build:language && npm run build:detournement",
     "prepublish": "npm run build",
     "publish:docs": "easystatic deploy docs --repo joelalejandro/twoet",
-    "start": "easystatic start docs"
+    "start": "babel-node ./server/index.js"
   }
 }
