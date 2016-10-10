@@ -1,6 +1,6 @@
 # [twoet](https://github.com/joelalejandro/twoet)
 
-> A tweet-fed poem generator.
+> A tweet-fed poem generator. [Live demo here, at Twoemme.](http://twoemme.com/)
 
 ### About this project
 
