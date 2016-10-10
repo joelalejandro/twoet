@@ -18,7 +18,7 @@ const readTwoem = (poem, res) => {
   res.write('<p>escrito por ' + poem.authors.map((author) => {
     return `<a href="https://twitter.com/${author.id}">@${author.alias}</a>`;
   }).join(', ') + '</p>');
-  res.write('<p>compartir: <input size="40" type="text" value="http://twoemme.com/' + poem.id + '"></p>')
+  res.write('<p><a href="/">leer más</a> | compartir: <input size="40" type="text" value="http://twoemme.com/' + poem.id + '"></p>')
 };
 
 const sendAnalytics = (res) => {
