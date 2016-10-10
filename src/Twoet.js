@@ -165,6 +165,7 @@ class Twoet extends EventEmitter {
     const title = `Twoem ${titleBlocks.join(' ')}`;
 
     return {
+      id: titleBlocks.join(''),
       title: title,
       authors: authors,
       verses: poem
