@@ -10,9 +10,10 @@ const app = express();
 const args = minimist(process.argv.slice(2));
 
 const readTwoem = (poem, res) => {
-  res.write('<!doctype html');
+  res.write('<!doctype html>');
   res.write('<html lang="es">');
   res.write('<head>');
+  res.write(`<title>${poem.title}</title>`);
   res.write(`<meta property="og:url" content="http://twoemme.com/${poem.id}" />`);
   res.write('<meta property="og:type" content="article" />');
   res.write(`<meta property="og:title" content="${poem.title}" />`);
