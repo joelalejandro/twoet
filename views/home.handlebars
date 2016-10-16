@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="{{twoem.language}}">
+  <head>
+    <meta charset="utf-8">
+    <title>{{twoem.title}}</title>
+    {{> facebook/open-graph url=twoem.url description=twoem.meta_description }}
+    {{> twitter/metadata site=config.twitter.card_username title=twoem.title description=twoem.meta_description }}
+    {{> style }}
+  </head>
+  <body>
+{{package.repository}}
+    {{> facebook/sdk appId=config.facebook.app_id }}
+    <header>
+      <h1><span>T</span><span>w</span><span>O</span><span>e</span><span>M</span><span>m</span><span>e</span></h1>
+      <h2>{{{wording.slogan}}}<br><a href="#" class="what-is-this">¿qué es esto?</a></h2>
+    </header>
+    <h3>{{twoem.title}}
+      <br><small>&mdash; {{wording.found}} {{twoem.view_count}} {{wording.times}} &mdash;</small>
+      <a href="/">[ {{wording.newPoem}} ]</a>
+    </h3>
+    <article class="twoem">{{{twoem.html}}}</article>
+    <div class="authors">{{wording.writtenBy}} {{#each twoem.authors}}
+      <a href="{{contribution_url}}">@{{screen_name}}</a>
+    {{/each}}</div>
+    </p>
+    {{> facebook/like url=twoem.url }}
+    {{> twitter/tweet }}
+    {{#if config.analytics.enabled}}
+      {{> google-analytics trackingId=config.analytics.tracking_id}}
+    {{/if}}
+    {{> what-is-this wording=wording.whatIsThis }}
+
+    <footer>
+      hecho por <em>&hearts;</em> al arte por <a href="https://github.com/joelalejandro">@joelalejandro</a>
+    </footer>
+  </body>
+</html>
