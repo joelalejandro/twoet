@@ -6,20 +6,22 @@
     "access_token_secret": "",
     "card_username": ""
   },
+  "database": "mongodb://localhost/twoet",
   "analytics": {
     "tracking_id": ""
   },
   "twoet": {
     "faux_detournement": {
       "enabled": true,
-      "sample_size": 1000
+      "sample_size": 200
     },
     "detournement_context": {
       "language": "es",
       "size": 10
     },
     "poem_rules": {
-      "verse_count": 4
+      "verse_count": 4,
+      "syllable_count": [8, 9, 10, 11, 12, 13, 14, 15, 16]
     },
     "rhyming_plugins": {
       "es": {
@@ -32,6 +34,20 @@
           "mapping": {
             "rhyme": "rhyme",
             "asonance": "asonance"
+          }
+        }
+      }
+    },
+    "syllable_plugins": {
+      "es": {
+        "package": "silabas",
+        "requires_new": false,
+        "post_install": "",
+        "input": "call",
+        "output": {
+          "type": "object",
+          "mapping": {
+            "syllables": "syllables"
           }
         }
       }
