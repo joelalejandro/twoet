@@ -1,3 +1,184 @@
     <style>
-      body{margin:0;font-family:monospace;font-size:2em;text-align:center}input{font-family:monospace;font-size:1em}.json-markup{line-height:1.2em;font-size:1em;font-family:monospace;white-space:pre-line}.json-markup-key{font-weight:700}.json-markup-bool{color:#b22222}.json-markup-string{color:green}.json-markup-null{color:gray}.json-markup-number{color:#00f}.twoem{background:#eee;padding:20px;}header{color:#999;width:auto;display:inline-block;margin:0 auto;}header h1{float:left;padding-right:20px;border-right:3px solid rgba(0,172,237,0.3);}header h1 span:nth-of-type(2),header h1 span:nth-of-type(6){font-family:sans-serif;}header h1 span:nth-of-type(4),header h1 span:nth-of-type(7){font-style:italic;font-family:serif;}header h2{font-size:1em;text-align:left;margin:0;padding-top:30px;float:left;padding-left:20px;}header:after{content:' ';display:block;clear:both;}h3 small{color:#888;}header h1::first-letter,header h2::first-letter,a{color:#00aced;}h3 a{text-decoration: none}.authors{font-size:0.75em;margin-top:16px;}.authors a:after{content:'|';display:inline-block;color:#888;margin-left:16px;}.authors a:last-child:after{content:'';display:none;}input[type="url"]{text-align:center;}.what-is-this{display:block;font-size:0.5em;}#what-is-this{display:none;background:rgba(0,172,237,0.75);color:#000;width:100%;height:100%;position:fixed;top:0;left:0;font-size:1.25em;}#what-is-this button.close{font-family:sans-serif;font-weight:100;background:none;border:none;font-size:4em;position:absolute;right:2%;bottom:4%;line-height:1;color:#fff;}#what-is-this article{position:absolute;left:2%;top:2%;width:75%;text-align:justify;text-shadow:1px 1px 1px #fff;}#what-is-this article a{color:#fff;}#what-is-this.visible{display:block;}#what-is-this button.close:focus{user-select:none;}footer{margin-top:1em;font-size:0.5em;}footer em{color:#b00;font-size:2em;position:relative;top:5px;}
+      body {
+          margin: 0;
+          font-family: monospace;
+          font-size: 2em;
+          text-align: center
+      }
+      input {
+          font-family: monospace;
+          font-size: 1em
+      }
+      .json-markup {
+          line-height: 1.2em;
+          font-size: 1em;
+          font-family: monospace;
+          white-space: pre-line
+      }
+      .json-markup-key {
+          font-weight: 700
+      }
+      .json-markup-bool {
+          color: #b22222
+      }
+      .json-markup-string {
+          color: green
+      }
+      .json-markup-null {
+          color: gray
+      }
+      .json-markup-number {
+          color: #00f
+      }
+      .twoem {
+          background: #eee;
+          padding: 20px;
+      }
+      header {
+          color: #999;
+          width: auto;
+          display: inline-block;
+          margin: 0 auto;
+      }
+      header h1 {
+          float: left;
+          padding-right: 20px;
+          border-right: 3px solid rgba(0, 172, 237, 0.3);
+      }
+      header h1 span:nth-of-type(2),
+      header h1 span:nth-of-type(6) {
+          font-family: sans-serif;
+      }
+      header h1 span:nth-of-type(4),
+      header h1 span:nth-of-type(7) {
+          font-style: italic;
+          font-family: serif;
+      }
+      header h2 {
+          font-size: 1em;
+          text-align: left;
+          margin: 0;
+          padding-top: 30px;
+          float: left;
+          padding-left: 20px;
+      }
+      header:after {
+          content: ' ';
+          display: block;
+          clear: both;
+      }
+      h3 small {
+          color: #888;
+      }
+      header h1::first-letter,
+      header h2::first-letter,
+      a {
+          color: #00aced;
+      }
+      h3 a {
+          text-decoration: none
+      }
+      .authors {
+          font-size: 0.75em;
+          margin-top: 16px;
+      }
+      .authors a:after {
+          content: '|';
+          display: inline-block;
+          color: #888;
+          margin-left: 16px;
+      }
+      .authors a:last-child:after {
+          content: '';
+          display: none;
+      }
+      input[type="url"] {
+          text-align: center;
+      }
+      .what-is-this {
+          display: block;
+          font-size: 0.5em;
+      }
+      #what-is-this {
+          display: none;
+          background: rgba(0, 172, 237, 0.75);
+          color: #000;
+          width: 100%;
+          height: 100%;
+          position: fixed;
+          top: 0;
+          left: 0;
+          font-size: 1.25em;
+      }
+      #what-is-this button.close {
+          font-family: sans-serif;
+          font-weight: 100;
+          background: none;
+          border: none;
+          font-size: 4em;
+          position: absolute;
+          right: 2%;
+          bottom: 4%;
+          line-height: 1;
+          color: #fff;
+      }
+      #what-is-this article {
+          position: absolute;
+          left: 2%;
+          top: 2%;
+          width: 75%;
+          text-align: justify;
+          text-shadow: 1px 1px 1px #fff;
+      }
+      #what-is-this article a {
+          color: #fff;
+      }
+      #what-is-this.visible {
+          display: block;
+      }
+      #what-is-this button.close:focus {
+          user-select: none;
+      }
+      footer {
+          margin-top: 1em;
+          font-size: 0.5em;
+      }
+      footer em {
+          color: #b00;
+          font-size: 2em;
+          position: relative;
+          top: 5px;
+      }
+
+      @media only screen and (min-width: 480px) {
+        header {
+          font-size: 2em;
+        }
+        header h1 {
+          float: none;
+          border: none;
+          margin: 0.5em 0;
+        }
+        header h2 {
+          float: none;
+          text-align: center;
+          padding-top: 0;
+          margin: 0;
+        }
+        h3 {
+          margin: 2em 0;
+        }
+        h3 a {
+          display: block;
+        }
+        .authors a {
+          display: block;
+        }
+        .authors a:after {
+          display: none;
+        }
+        .fb-like, .twitter-share-button {
+          display: none;
+        }
+      }
     </style>
