@@ -334,11 +334,19 @@ class Twoet extends EventEmitter {
       if (err) {
         console.log(err);
       }
+      this._announce(twoem);
       this.emit('composed', twoem);
     });
 
     this.isComposing = false;
     this._resetComposingState();
+  }
+
+  _announce(twoem) {
+    T.post('statuses/update', {
+      status: twoem.authors.map(author => { return `@${author.screen_name}`; }).join(' ')
+            + ' han escrito un #twoemme juntos! - ' + twoem.url
+    });
   }
 
   _resetComposingState() {
