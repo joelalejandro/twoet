@@ -45,10 +45,13 @@
     "eslint-plugin-jsx-a11y": "^1.0.4",
     "eslint-plugin-react": "^5.0.1",
     "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
     "istanbul": "^1.0.0-alpha.2",
     "json-markup": "^1.0.0",
     "minimist": "^1.2.0",
     "mocha": "^2.4.5",
+    "mongoose": "^4.6.3",
+    "nodemon": "^1.11.0",
     "pace": "0.0.4",
     "promised-exec": "^1.0.1",
     "rollup": "^0.26.2",
@@ -66,6 +69,7 @@
     "build": "node tools/build && npm run build:language && npm run build:detournement",
     "prepublish": "npm run build",
     "publish:docs": "easystatic deploy docs --repo joelalejandro/twoet",
-    "start": "babel-node ./server/index.js"
+    "start": "babel-node ./server/app.js",
+    "watch": "nodemon --watch ./server/app.js --watch ./src --watch ./views --exec \"babel-node\" ./server/app.js --no-analytics"
   }
 }
