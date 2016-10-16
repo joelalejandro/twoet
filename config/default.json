@@ -14,7 +14,7 @@
     "featured_count": 10,
     "faux_detournement": {
       "enabled": true,
-      "sample_size": 200
+      "sample_size": 10000
     },
     "detournement_context": {
       "language": "es",
