@@ -22,6 +22,9 @@ import Twit from 'twit';
 import Config from 'config';
 import EventEmitter from 'events';
 import fs from 'fs';
+import mongoose from 'mongoose';
+import { User, Media, Tweet, Twoem } from '../tools/schema';
+import jsonMarkup from 'json-markup';
 
 const T = new Twit(Config.get('twitter'));
 
@@ -34,31 +37,109 @@ class Twoet extends EventEmitter {
     this.settings = Object.assign(settings, Config.get('twoet'));
   }
 
-  detourne(tweetCount = 10) {
-    return new Promise((resolve, reject) => {
-      if (this.settings.faux_detournement.enabled) {
-        try {
-          this.tweets = JSON.parse(fs.readFileSync('config/faux_detournement_data.json')).shuffle();
-          resolve(this.tweets);
-        } catch (e) {
-          reject(e);
-        }
-      } else {
-        const stream = T.stream('statuses/sample', this.settings.detournement_context);
-        stream.on('tweet', (tweet) => {
-          this.tweets.push(tweet);
-          this.emit('detournedStep', tweet);
-          if (this.tweets.length === tweetCount) {
-            stream.stop();
-            resolve(this.tweets);
-          }
-        });
-        stream.on('error', reject);
-      }
-    });
+  _log(level = 'errors') {
+    const errors = () => {
+      this.on('detournementFailed', (err) => { console.log('Failed to detourne a tweet: ', err.stack); });
+      this.on('rhymingTweetSearchFailed', (err) => { console.log('Failed while searching rhyming tweets: ', err.stack) });
+      this.on('invalidWord', (word) => { console.log('Unrhymable word: ', word) });
+    };
+
+    const warnings = () => {
+      this.on('noRhyme', (word) => { console.log('No rhymes for ', word) });
+    };
+
+    const info = () => {
+      this.on('beginComposing', () => { console.log('Begin composing new twoem') });
+      this.on('nextVerse', () => { console.log('Next verse started', this.composingState) });
+      this.on('writeVerse', () => { console.log('Writing a verse') });
+      this.on('tweetDetourned', (tweet) => { console.log('Using tweet: ', tweet) });
+      this.on('invokeRhymer', (word) => { console.log('Attempting to rhyme ', word) });
+      this.on('invokeSyllabler', (word) => { console.log('Attempting to count syllables for ', word) });
+      this.on('wordPluginReady', (plugin) => { console.log('Word plugin ready: ', plugin )});
+      this.on('wordPluginCalled', (output) => { console.log('Word plugin called: ', output )});
+      this.on('wordPluginParsed', (output) => { console.log('Word plugin parsed: ', output )});
+      this.on('rhymingTweetSearchCompleted', (tweets) => { console.log('Found ', tweets.length, ' matching tweets') });
+      this.on('asonantTweetSearchCompleted', (tweets) => { console.log('Fallback to asonant tweets (found ' + tweets.length + ' matches)') });
+      this.on('poemReady', () => { console.log('Poem ready: ', this.composingState) });
+      this.on('composed', (twoem) => { console.log('Twoem: ', twoem) });
+    };
+
+    if (level === 'errors') {
+      errors();
+    } else if (level === 'warnings') {
+      errors();
+      warnings();
+    } else if (level === 'info') {
+      errors();
+      warnings();
+      info();
+    }
   }
 
-  sanitize(tweet) {
+  _openDatabase() {
+    if (mongoose.Promise !== global.Promise) {
+      mongoose.Promise = global.Promise;
+    }
+
+    if (!this.connection) {
+      this.connection = mongoose.connect(Config.get('database'));
+      this.emit('databaseConnected');
+    }
+
+    this.emit('databaseOpened');
+
+    return this.connection;
+  }
+
+  _createTweetModel(rawTweet, twoetMetadata) {
+    const user = new User({
+      id_str: rawTweet.user.id_str,
+      name: rawTweet.user.name,
+      screen_name: rawTweet.user.screen_name,
+      location: rawTweet.user.location,
+      description: rawTweet.user.description,
+      profile_image_url: rawTweet.user.profile_image_url
+    });
+
+    const media = rawTweet.entities.media ? rawTweet.entities.media.map((image) => {
+      return new Media({
+        id_str: image.id_str,
+        media_url: image.media_url,
+        display_url: image.display_url,
+        extended_url: image.extended_url,
+        width: image.sizes.large.w,
+        height: image.sizes.large.h
+      });
+    }) : [];
+
+    const hashtags = rawTweet.entities.hashtags ? rawTweet.entities.hashtags.map((hashtag) => {
+      return hashtag.text;
+    }) : [];
+
+    const user_mentions = rawTweet.entities.user_mentions ? rawTweet.entities.user_mentions.map((user_mention) => {
+      return new User({
+        id_str: user_mention.id_str,
+        name: user_mention.name,
+        screen_name: user_mention.screen_name
+      });
+    }) : [];
+
+    const tweet = new Tweet(Object.assign({
+      created_at: rawTweet.created_at,
+      id_str: rawTweet.id_str,
+      text: rawTweet.text,
+      user,
+      hashtags,
+      user_mentions,
+      media,
+      filter_level: rawTweet.filter_level,
+      lang: rawTweet.lang
+    }, twoetMetadata));
+
+    return tweet;
+  }
+
+  _sanitize(tweet) {
     let text = tweet.text.replace(/\n/g, '').replace(/RT /g, '');
 
     tweet.entities.user_mentions.forEach((user) => {
@@ -76,100 +157,226 @@ class Twoet extends EventEmitter {
     return text;
   }
 
-  getRhymes(word, tweets = this.tweets) {
-    const rhymingContext = this.settings.rhyming_plugins[this.settings.detournement_context.language];
-    let rhymingPackage = require(rhymingContext.package);
-
-    if (rhymingContext.requires_new) {
-      rhymingPackage = new rhymingPackage();
-    }
-
+  _invokeWordPlugin(type, word) {
     const sanitizedWord = word.replace(/[^a-záéíóúñü]+/gi, '');
+    const context = this.settings[`${type}_plugins`][this.settings.detournement_context.language];
+    let plugin = require(context.package);
 
-    try {
-      const rhymingRawOutput = rhymingPackage[rhymingContext.input].call(null, sanitizedWord);
-      let rhymingOutput = {};
-
-      if (rhymingContext.output.type === 'object' && typeof rhymingRawOutput === 'object') {
-        Object.keys(rhymingContext.output.mapping).forEach((destination) => {
-          rhymingOutput[destination] = rhymingRawOutput[rhymingContext.output.mapping[destination]];
-        });
-      }
-
-      if (rhymingOutput.rhyme === '') {
-        console.log('Rhyme not found');
-        return [];
-      } else {
-        console.log('Rhyme found', rhymingOutput);
-        let filtered = tweets.filter(tweet => {
-          return new RegExp(`${rhymingOutput.rhyme}(\.)?$`, 'i').test(this.sanitize(tweet));
-        });
-        console.log(`Rhyming tweets: ${filtered.length}`);
-        return filtered;
-      }
-    } catch (e) {
-      console.log('Invalid word: ' + sanitizedWord);
-      return [];
+    if (context.requires_new) {
+      plugin = new plugin();
     }
+
+    this.emit('wordPluginReady', plugin);
+
+    const rawOutput = context.input !== 'call'
+      ? plugin[context.input].call(null, sanitizedWord)
+      : plugin.call(null, sanitizedWord);
+
+    this.emit('wordPluginCalled', rawOutput);
+
+    let output = {};
+
+    if (context.output.type === 'object' && typeof rawOutput === 'object') {
+      Object.keys(context.output.mapping).forEach((destination) => {
+        const rawOutputResult = rawOutput[context.output.mapping[destination]];
+        if (typeof rawOutputResult === 'function') {
+          output[destination] = rawOutputResult();
+        } else {
+          output[destination] = rawOutputResult;
+        }
+      });
+    }
+
+    this.emit('wordPluginParsed', output);
+
+    return output;
   }
 
-  compose(tweets = this.tweets, verses = this.settings.poem_rules.verse_count) {
-    let blockA = [], blockB = [], poem = [];
-    let i = 0;
-    let processed = 0;
-    let authors = [];
-    let titleBlocks = [];
+  invokeRhymer(word) {
+    this.emit('invokeRhymer', word);
+    return this._invokeWordPlugin('rhyming', word);
+  }
 
-    while (processed < verses) {
-      const tweet = tweets[i];
+  invokeSyllabler(word) {
+    this.emit('invokeSyllabler', word);
+    return this._invokeWordPlugin('syllable', word);
+  }
 
-      if (!tweet) {
-        tweets.shuffle();
-        blockA = [];
-        blockB = [];
-        i = 0;
-        processed = 0;
-        continue;
+  _wildcardize(expression, limit) {
+    return expression.split(' ').map((char, index) => {
+      return (index / 2) % 2 === 0 ? (char + '.' + ((limit > 1) ? '{1,' + limit + '}' : '')) : char;
+    });
+  }
+
+  _getRhymes(word) {
+    return new Promise((resolve, reject) => {
+      try {
+        const rhymingOutput = this.invokeRhymer(word);
+        if (!rhymingOutput || rhymingOutput.rhyme === '') {
+          this.emit('noRhyme', word);
+          reject('no rhyme');
+        } else {
+          this.emit('rhyme', rhymingOutput);
+          Tweet.find({
+            sanitized_text: new RegExp(`${rhymingOutput.rhyme}(\.)?$`, 'i'),
+            id_str: {
+              $nin: this.composingState.candidateTweet.id_str
+            }
+          }).then((tweets) => {
+            this.emit('rhymingTweetSearchCompleted', tweets);
+            if (tweets.length < 2) {
+              const limit = rhymingOutput.rhyme.indexOf(rhymingOutput.asonance.substr(-1)) - rhymingOutput.rhyme.indexOf(rhymingOutput.asonance[0]) - 1;
+              const wildcardAsonance = this._wildcardize(rhymingOutput.asonance, limit);
+              Tweet.find({
+                sanitized_text: new RegExp(`${wildcardAsonance}(\.)?$`, 'i'),
+                id_str: {
+                  $nin: this.composingState.candidateTweet.id_str
+                }
+              }).then((asonanceTweets) => {
+                this.emit('asonantTweetSearchCompleted', asonanceTweets);
+                resolve(asonanceTweets);
+              });
+            } else {
+              resolve(tweets);
+            }
+          }).catch((err) => {
+            this.emit('rhymingTweetSearchFailed', err);
+          });
+        }
+      } catch (e) {
+        this.emit('invalidWord', sanitizedWord);
+        reject('invalid word');
       }
+    });
+  }
 
-      let text = this.sanitize(tweet);
+  _writeVerse(processed, verses) {
+    this.emit('writeVerse');
+    Tweet.detourne().then((tweet) => {
+      this.emit('tweetDetourned', tweet);
+      this.composingState.candidateTweet = tweet;
 
-      let lastWord = text.split(' ').pop();
-      let rhyme = this.getRhymes(lastWord, tweets.filter(t => { return t.id_str !== tweet.id_str }));
+      let text = tweet.sanitized_text;
 
-      if (rhyme.length > 0) {
-        blockA.push(text);
-        let tweetB = rhyme.shuffle()[Math.floor(Math.random() * rhyme.length)];
-        blockB.push(this.sanitize(tweetB));
+      let lastWord = tweet.last_word;
+      this._getRhymes(lastWord).then((rhymes) => {
+        let tweetB = rhymes.filter((rhymed) => {
+          return Math.abs(tweet.syllables - rhymed.syllables) === 2;
+        }).shuffle()[Math.floor(Math.random() * rhymes.length)];
 
-        authors.push({ name: tweet.user.name, alias: tweet.user.screen_name, id: tweet.user.screen_name + '/status/' + tweet.id_str});
-        authors.push({ name: tweetB.user.name, alias: tweetB.user.screen_name, id: tweetB.user.screen_name + '/status/' + tweetB.id_str });
+        if (!tweetB) {
+          this.emit('nextVerse');
+          return;
+        }
 
-        titleBlocks.push(tweet.id_str.substr(-4));
-        titleBlocks.push(tweetB.id_str.substr(-4));
+        this.composingState.blockA.push(text);
+        this.composingState.blockB.push(tweetB.sanitized_text);
 
-        processed += 2;
-      }
+        this.composingState.authors.push(new User({
+          name: tweet.user.name,
+          screen_name: tweet.user.screen_name,
+          contribution_url: tweet.url
+        }));
+        this.composingState.authors.push(new User({
+          name: tweetB.user.name,
+          screen_name: tweetB.user.screen_name,
+          contribution_url: tweetB.url
+        }));
 
-      i += 1;
+        this.composingState.titleBlocks.push(tweet.id_str.substr(-4));
+        this.composingState.titleBlocks.push(tweetB.id_str.substr(-4));
+
+        this.composingState.usedTweets.push(tweet.id_str);
+        this.composingState.usedTweets.push(tweetB.id_str);
+
+        this.composingState.processed += 2;
+
+        if (this.composingState.processed < this.composingState.verses) {
+          this.emit('nextVerse');
+        } else {
+          this.emit('poemReady');
+        }
+      }).catch((err) => {
+        this.emit('nextVerse');
+      });
+    }).catch((err) => {
+      this.emit('detournementFailed', err);
+    });
+  }
+
+  _arrangeVerses() {
+    let i;
+
+    for (i = 0; i < this.composingState.blockA.length; i++) {
+      this.composingState.poem.push(this.composingState.blockA[i]);
     }
 
-    for (i = 0; i < blockA.length; i++) {
-      poem.push(blockA[i]);
+    for (i = 0; i < this.composingState.blockB.length; i++) {
+      this.composingState.poem.push(this.composingState.blockB[i]);
     }
 
-    for (i = 0; i < blockB.length; i++) {
-      poem.push(blockB[i]);
-    }
+    const title = `Twoem ${this.composingState.titleBlocks.join(' ')}`;
 
-    const title = `Twoem ${titleBlocks.join(' ')}`;
-
-    return {
-      id: titleBlocks.join(''),
+    const twoem = new Twoem({
+      id_str: this.composingState.titleBlocks.join(''),
       title: title,
-      authors: authors,
-      verses: poem
+      used_tweets: this.composingState.usedTweets,
+      authors: this.composingState.authors,
+      verses: this.composingState.poem,
+      url: `http://twoemme.com/${this.composingState.titleBlocks.join('')}`,
+      meta_description: `Un poema colaborativo escrito por ${this.composingState.authors.map(author => { return '@' + author.screen_name; })}`,
+      created_at: new Date(),
+      view_count: 1,
+      html: jsonMarkup(this.composingState.poem)
+    });
+
+    twoem.save((err) => {
+      if (err) {
+        console.log(err);
+      }
+      this.emit('composed', twoem);
+    });
+
+    this.isComposing = false;
+    this._resetComposingState();
+  }
+
+  _resetComposingState() {
+    this.composingState = {
+      candidateTweet: null,
+      blockA: [],
+      blockB: [],
+      poem: [],
+      processed: 0,
+      verses: this.settings.poem_rules.verse_count,
+      authors: [],
+      titleBlocks: [],
+      usedTweets: []
     };
+
+    this.removeAllListeners('nextVerse');
+    this.removeAllListeners('poemReady');
+  }
+
+  compose() {
+    this.emit('beginComposing');
+
+    this.isComposing = true;
+    this._resetComposingState();
+
+    this._openDatabase();
+
+    this.on('nextVerse', this._writeVerse);
+    this.on('poemReady', this._arrangeVerses);
+
+    this.emit('nextVerse');
+  }
+
+  read(twoemID) {
+    this._openDatabase();
+    return new Promise((resolve, reject) => {
+      Twoem.findOneAndUpdate({ id_str: twoemID }, { $inc: { view_count: 1 }}).then(resolve);
+    });
   }
 }
 
