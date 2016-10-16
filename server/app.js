@@ -39,7 +39,7 @@ const homeModel = function(twoem) {
     },
     config: {
       twitter: {
-        card_username: Config.get('twitter.card_username')
+        card_username: Config.get('twitter.card_username'),
         widget: {
           enabled: Config.get('twitter.widget.enabled')
         }
