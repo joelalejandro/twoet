@@ -62,6 +62,9 @@ app.get('/(:id)?', function (req, res) {
     tw.compose();
     tw.once('composed', (twoem) => {
       res.redirect(`/${twoem.id_str}`);
+      if (Config.twitter.announce) {
+        tw._announce(twoem);
+      }
     });
   }
 });

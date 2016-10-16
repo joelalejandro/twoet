@@ -25,13 +25,18 @@
     </p>
     {{> facebook/like url=twoem.url }}
     {{> twitter/tweet }}
+
     {{#if config.analytics.enabled}}
       {{> google-analytics trackingId=config.analytics.tracking_id}}
     {{/if}}
     {{> what-is-this wording=wording.whatIsThis }}
 
+    {{> twitter/widget }}
+
     <footer>
       hecho por <em>&hearts;</em> al arte por <a href="https://github.com/joelalejandro">@joelalejandro</a>
     </footer>
+
+    {{> twitter/scripts }}
   </body>
 </html>

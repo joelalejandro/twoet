@@ -334,7 +334,6 @@ class Twoet extends EventEmitter {
       if (err) {
         console.log(err);
       }
-      this._announce(twoem);
       this.emit('composed', twoem);
     });
 
