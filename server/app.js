@@ -15,10 +15,10 @@ app.set('view engine', 'handlebars');
 
 const tw = new Twoet();
 
-const homeModel = function(twoem) {
-  console.log(twoem);
+const homeModel = function(twoem, popular) {
   return {
     twoem: twoem,
+    popular: popular,
     wording: {
       slogan: 'poemas colaborativos<br>de autores desconocidos',
       newPoem: 'otro poema',
@@ -58,7 +58,9 @@ app.get('/(:id)?', function (req, res) {
       if (!twoem) {
         res.redirect('/');
       } else {
-        res.render('home', homeModel(twoem));
+        tw.getFeaturedList(Config.twoet.featured_count).then((popular) => {
+          res.render('home', homeModel(twoem, popular));
+        });
       }
     });
   } else {

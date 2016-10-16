@@ -1,0 +1,9 @@
+<h3>Los {{amount}} poemas más populares</h3>
+{{#each list}}
+  <p class="featured-twoem">
+    <a href="{{url}}">{{title}}</a> ({{view_count}})<br>
+    <small class="authors">{{#each authors}}
+      <a href="{{contribution_url}}">@{{screen_name}}</a>
+    {{/each}}</small>
+  </p>
+{{/each}}

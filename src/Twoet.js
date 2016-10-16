@@ -62,6 +62,8 @@ class Twoet extends EventEmitter {
       this.on('asonantTweetSearchCompleted', (tweets) => { console.log('Fallback to asonant tweets (found ' + tweets.length + ' matches)') });
       this.on('poemReady', () => { console.log('Poem ready: ', this.composingState) });
       this.on('composed', (twoem) => { console.log('Twoem: ', twoem) });
+      this.on('read', (twoem) => { console.log('Twoem: ', twoem) });
+      this.on('getFeaturedList', (popular) => { console.log('Popular: ', popular.map(p => { return p.id_str; })) });
     };
 
     if (level === 'errors') {
@@ -382,7 +384,20 @@ class Twoet extends EventEmitter {
   read(twoemID) {
     this._openDatabase();
     return new Promise((resolve, reject) => {
-      Twoem.findOneAndUpdate({ id_str: twoemID }, { $inc: { view_count: 1 }}).then(resolve);
+      Twoem.findOneAndUpdate({ id_str: twoemID }, { $inc: { view_count: 1 }}).then((twoem) => {
+        this.emit('read', twoem);
+        resolve(twoem);
+      });
+    });
+  }
+
+  getFeaturedList(count) {
+    this._openDatabase();
+    return new Promise((resolve, reject) => {
+      Twoem.find({}).limit(count).sort({ view_count: -1 }).then((popular) => {
+        this.emit('getFeaturedList', popular);
+        resolve(popular);
+      });
     });
   }
 }
