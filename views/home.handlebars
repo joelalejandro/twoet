@@ -31,7 +31,9 @@
     {{/if}}
     {{> what-is-this wording=wording.whatIsThis }}
 
-    {{> twitter/widget }}
+    {{#if config.twitter.widget.enabled }}
+      {{> twitter/widget }}
+    {{/if}}
 
     <footer>
       hecho por <em>&hearts;</em> al arte por <a href="https://github.com/joelalejandro">@joelalejandro</a>
