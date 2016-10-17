@@ -10,6 +10,8 @@ a considerable sample of random tweets using Twitter's [Stream API `statuses/sam
 from a Node client called [`twit`](https://github.com/ttezel/twit),
 and then matching tweets in pairs with an `ABAB` rhyming scheme through [`rimador`](https://github.com/JavierRizzoA/rimador).
 
+Read more about this experiment [here](https://medium.com/@joel.a.villarreal/a-crossroad-of-art-and-software-composing-poetry-with-tweets-50787bd58fc1#.w7m00gvsu).
+
 ### How to install
 
 ```sh
