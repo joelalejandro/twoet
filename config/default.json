@@ -12,6 +12,9 @@
   },
   "twoet": {
     "featured_count": 10,
+    "auto_compose": {
+      "count": 500
+    },
     "faux_detournement": {
       "enabled": true,
       "sample_size": 10000
