@@ -9,14 +9,6 @@
 
 // Inject Array.shuffle
 // thanks to Bruno Leonardo Michels (http://stackoverflow.com/a/34377908/250301)
-Array.prototype.shuffle = function() {
-  let m = this.length, i;
-  while (m) {
-    i = (Math.random() * m--) >>> 0;
-    [this[m], this[i]] = [this[i], this[m]]
-  }
-  return this;
-}
 
 import Twit from 'twit';
 import Config from 'config';
@@ -25,16 +17,23 @@ import fs from 'fs';
 import mongoose from 'mongoose';
 import { User, Media, Tweet, Twoem } from '../tools/schema';
 import jsonMarkup from 'json-markup';
+import { mix } from 'mixwith';
+
+import shuffle from './Shuffle';
+import VisualTwoet from './VisualTwoet';
+import Databaseable from './Databaseable';
 
 const T = new Twit(Config.get('twitter'));
 
-class Twoet extends EventEmitter {
+class Twoet extends mix(EventEmitter).with(Databaseable) {
 
   constructor(settings = {}) {
     super();
     this.tweets = [];
 
-    this.settings = Object.assign(settings, Config.get('twoet'));
+    this.settings = Object.assign(Config.get('twoet'), settings);
+
+    this._vtw = new VisualTwoet();
   }
 
   _log(level = 'errors') {
@@ -64,6 +63,10 @@ class Twoet extends EventEmitter {
       this.on('composed', (twoem) => { console.log('Twoem: ', twoem) });
       this.on('read', (twoem) => { console.log('Twoem: ', twoem) });
       this.on('getFeaturedList', (popular) => { console.log('Popular: ', popular.map(p => { return p.id_str; })) });
+      this.on('beforeGenerateImage', () => { console.log('Ready to generate image') });
+      this._vtw.on('generateImageStarted', () => { console.log('Module: Generate image started') });
+      this._vtw.on('generateImageModuleLoaded', () => { console.log('Module: Generate image loaded') });
+      this._vtw.on('generateImageInitialized', () => { console.log('Module: Generate image initialized') });
     };
 
     if (level === 'errors') {
@@ -262,9 +265,9 @@ class Twoet extends EventEmitter {
 
       let lastWord = tweet.last_word;
       this._getRhymes(lastWord).then((rhymes) => {
-        let tweetB = rhymes.filter((rhymed) => {
+        let tweetB = shuffle(rhymes.filter((rhymed) => {
           return Math.abs(tweet.syllables - rhymed.syllables) === 2;
-        }).shuffle()[Math.floor(Math.random() * rhymes.length)];
+        }))[Math.floor(Math.random() * rhymes.length)];
 
         if (!tweetB) {
           this.emit('nextVerse');
@@ -397,6 +400,19 @@ class Twoet extends EventEmitter {
       Twoem.find({}).limit(count).sort({ view_count: -1 }).then((popular) => {
         this.emit('getFeaturedList', popular);
         resolve(popular);
+      });
+    });
+  }
+
+  generateImage(twoemID) {
+    return new Promise((resolve, reject) => {
+      this.emit('beforeGenerateImage');
+      this.read(twoemID).then(twoem => {
+        try {
+          this._vtw.generateImage(twoem).then(resolve);
+        } catch (e) {
+          console.log(e.stack);
+        }
       });
     });
   }
