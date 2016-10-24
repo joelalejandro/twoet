@@ -74,7 +74,6 @@
     "publish:docs": "easystatic deploy docs --repo joelalejandro/twoet",
     "start": "babel-node ./server/app.js",
     "compose": "babel-node tools/compose",
-    "render": "babel-node tools/render",
     "watch": "nodemon --watch ./server/app.js --watch ./src --watch ./views --exec \"babel-node\" ./server/app.js --no-analytics"
   }
 }
