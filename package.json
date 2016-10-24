@@ -35,6 +35,7 @@
     "babel-preset-es2015-rollup": "^1.1.1",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.8.0",
+    "canvas": "^1.6.1",
     "chai": "^3.5.0",
     "config": "^1.21.0",
     "coveralls": "^2.11.9",
@@ -49,11 +50,13 @@
     "istanbul": "^1.0.0-alpha.2",
     "json-markup": "^1.0.0",
     "minimist": "^1.2.0",
+    "mixwith": "^0.1.1",
     "mocha": "^2.4.5",
     "mongoose": "^4.6.3",
     "nodemon": "^1.11.0",
     "pace": "0.0.4",
     "promised-exec": "^1.0.1",
+    "request": "^2.75.0",
     "rollup": "^0.26.2",
     "rollup-plugin-babel": "^2.4.0",
     "sinon": "^2.0.0-pre"
@@ -71,6 +74,7 @@
     "publish:docs": "easystatic deploy docs --repo joelalejandro/twoet",
     "start": "babel-node ./server/app.js",
     "compose": "babel-node tools/compose",
+    "render": "babel-node tools/render",
     "watch": "nodemon --watch ./server/app.js --watch ./src --watch ./views --exec \"babel-node\" ./server/app.js --no-analytics"
   }
 }
