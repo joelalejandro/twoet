@@ -148,7 +148,9 @@ class QuandlPaperShreadGenerator extends mix(EventEmitter).with(Databaseable) {
         });
         this._stamp(canvas, twoem);
         twoem.png = canvas.toBuffer();
-        twoem.save().then(resolve);
+        twoem.save().then(() => {
+          resolve(twoem.png);
+        });
       });
     });
   }
