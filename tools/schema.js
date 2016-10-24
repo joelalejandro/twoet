@@ -53,18 +53,22 @@ const TwoemSchema = new Schema({
   meta_description: String,
   html: String,
   created_at: Date,
-  view_count: Number
+  view_count: Number,
+  png: Buffer
+});
+
+const QuandlPaperShreadSchema = new Schema({
+  quote_id: String,
+  refreshed_at: Date,
+  highs: [Number],
+  lows: [Number]
 });
 
 TweetSchema.statics.detourne = function() {
   return new Promise((resolve, reject) => {
-    //console.log('[TweetSchema] attempting detourn');
     this.count().then((count) => {
-      //console.log('[TweetSchema] counted');
       var rand = Math.floor(Math.random() * count);
-      //console.log('[TweetSchema] selected ', rand);
       this.findOne().skip(rand).then((data) => {
-        //console.log('[TweetSchema] found data: ', data);
         resolve(data);
       }).catch(reject);
     }).catch(reject);
@@ -75,5 +79,6 @@ const User = mongoose.model('User', UserSchema);
 const Media = mongoose.model('Media', MediaSchema);
 const Tweet = mongoose.model('Tweet', TweetSchema);
 const Twoem = mongoose.model('Twoem', TwoemSchema);
+const QuandlPaperShread = mongoose.model('QuandlPaperShread', QuandlPaperShreadSchema);
 
-export { User, Media, Tweet, Twoem };
+export { User, Media, Tweet, Twoem, QuandlPaperShread };
