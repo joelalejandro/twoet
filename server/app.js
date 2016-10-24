@@ -74,6 +74,22 @@ app.get('/(:id)?', function (req, res) {
   }
 });
 
+app.get('/(:id)/image', function (req, res) {
+  tw.read(req.params.id).then((twoem) => {
+    console.log('Ready to image');
+    res.header('Content-Type', 'image/png');
+    if (!twoem.png) {
+      console.log('Ready to generate image');
+      tw.generateImage(twoem.id_str).then((png) => {
+        console.log('Ready to send image');
+        res.send(png);
+      });
+    } else {
+      res.send(twoem.png);
+    }
+  });
+});
+
 if (args.setup) {
   exec('npm run build:language').then(() => {
     exec('npm run build:detournement').then(() => {
