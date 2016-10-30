@@ -1,0 +1,26 @@
+<script>
+    var readAsImageEl = document.querySelector('[data-js="readAsImage"]');
+    var readAsTextEl = document.querySelector('[data-js="readAsText"]');
+    var twoemText = document.querySelector('.twoem article');
+    var twoemImage = document.querySelector('.twoem figure');
+
+    readAsImageEl.onclick = function(event) {
+        event.preventDefault();
+
+        readAsTextEl.className = '';
+        readAsImageEl.className = 'hidden';
+
+        twoemImage.className = '';
+        twoemText.className = 'hidden';
+    }
+
+    readAsTextEl.onclick = function(event) {
+        event.preventDefault();
+
+        readAsTextEl.className = 'hidden';
+        readAsImageEl.className = '';
+
+        twoemImage.className = 'hidden';
+        twoemText.className = '';
+    }
+</script>
