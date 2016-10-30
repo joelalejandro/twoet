@@ -46,6 +46,9 @@ const homeModel = function(twoem, popular) {
           enabled: Config.get('twitter.widget.enabled')
         }
       },
+      facebook: {
+        app_id: Config.get('facebook.app_id')
+      },
       analytics: {
         enabled: args.hasOwnProperty('analytics') ? args.analytics : true,
         tracking_id: Config.get('analytics.tracking_id')
