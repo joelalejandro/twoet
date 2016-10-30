@@ -3,8 +3,14 @@
   <head>
     <meta charset="utf-8">
     <title>{{twoem.title}}</title>
-    {{> facebook/open-graph url=twoem.url description=twoem.meta_description }}
-    {{> twitter/metadata site=config.twitter.card_username title=twoem.title description=twoem.meta_description }}
+    {{> facebook/open-graph
+          url=twoem.url
+          description=twoem.meta_description }}
+    {{> twitter/metadata
+          site=config.twitter.card_username
+          title=twoem.title
+          description=twoem.meta_description
+          url=twoem.url }}
     {{> style }}
   </head>
   <body>
