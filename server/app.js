@@ -35,7 +35,9 @@ const homeModel = function(twoem, popular) {
                 + '<br><br>'
                 + 'twoemme es open source, y estás invitado a descubrir cómo funciona '
                 + 'consultando el repositorio en '
-                + '<a href="https://github.com/joelalejandro/twoet">GitHub</a>.'
+                + '<a href="https://github.com/joelalejandro/twoet">GitHub</a>.',
+      readAsImage: 'leer como imagen',
+      readAsText: 'leer como texto'
     },
     config: {
       twitter: {

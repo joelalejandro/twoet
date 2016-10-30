@@ -24,7 +24,14 @@
       <br><small>&mdash; {{wording.found}} {{twoem.view_count}} {{wording.times}} &mdash;</small>
       <a href="/">[ {{wording.newPoem}} ]</a>
     </h3>
-    <article class="twoem">{{{twoem.html}}}</article>
+    <p>
+      <a href="#" data-js="readAsImage">{{wording.readAsImage}}</a>
+      <a href="#" class="hidden" data-js="readAsText">{{wording.readAsText}}</a>
+    </p>
+    <section class="twoem">
+      <article>{{{twoem.html}}}</article>
+      <figure class="hidden"><img src="/{{twoem.id_str}}/image"></figure>
+    </section>
     <div class="authors">{{wording.writtenBy}} {{#each twoem.authors}}
       <a href="{{contribution_url}}">@{{screen_name}}</a>
     {{/each}}</div>
@@ -48,5 +55,6 @@
     </footer>
 
     {{> twitter/scripts }}
+    {{> twoem/scripts }}
   </body>
 </html>
