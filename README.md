@@ -53,3 +53,7 @@ http://imgur.com/b8P94di
 ### License
 
 MIT © 2016 Joel A. Villarreal Bertoldi
+
+### Join the community
+
+[Like](https://www.facebook.com/the.twoet/) the project's Facebook page! :)
