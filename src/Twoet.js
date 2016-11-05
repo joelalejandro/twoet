@@ -227,7 +227,7 @@ class Twoet extends mix(EventEmitter).with(Databaseable) {
             id_str: {
               $nin: this.composingState.candidateTweet.id_str
             }
-          }).then((tweets) => {
+          }).limit(10).then((tweets) => {
             this.emit('rhymingTweetSearchCompleted', tweets);
             if (tweets.length < 2) {
               const limit = rhymingOutput.rhyme.indexOf(rhymingOutput.asonance.substr(-1)) - rhymingOutput.rhyme.indexOf(rhymingOutput.asonance[0]) - 1;
@@ -237,7 +237,7 @@ class Twoet extends mix(EventEmitter).with(Databaseable) {
                 id_str: {
                   $nin: this.composingState.candidateTweet.id_str
                 }
-              }).then((asonanceTweets) => {
+              }).limit(10).then((asonanceTweets) => {
                 this.emit('asonantTweetSearchCompleted', asonanceTweets);
                 resolve(asonanceTweets);
               });
